@@ -1,0 +1,1 @@
+CoNectivITTy: A attempt made by NIT Trichy student to connected the community of NIT Trichy current students and its alumni. It will provide an easy access to like minded people and make networking easier. Students can directly and easily connect with seniors and alumni and get better guidence and resources.
