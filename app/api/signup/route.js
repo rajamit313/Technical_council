@@ -39,7 +39,7 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error("Signup error:", error.message);
+    
     return new Response(JSON.stringify({ success: false, error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
