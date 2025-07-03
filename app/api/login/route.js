@@ -1,38 +1,35 @@
+import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt';
 import User from "@/model/user";
 import { dbConnect } from "@/lib/mongoose";
-import bcrypt from "bcrypt";
+import { cookies } from "next/headers";
+
+const JWT_SECRET = process.env.JWT_SECRET || "SuperSecret";
 
 export async function POST(request) {
-  try {
-    const { rollNo, password } = await request.json();
+    const body = await request.json();
     await dbConnect();
 
-    const user = await User.findOne({ rollNo });
-    if (!user) {
-      return new Response(JSON.stringify({ success: false, error: "User not found!" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    const doc = await User.findOne({ rollNo: body.rollNo });
+    if (!doc) return NextResponse.json({ success: false, message: 'Login unsuccessful' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return new Response(JSON.stringify({ success: false, error: "Invalid password!" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    const passwordMatch = await bcrypt.compare(body.password, doc.password);
+    if (!passwordMatch) return NextResponse.json({ success: false, message: 'Login unsuccessful' });
 
-    return new Response(JSON.stringify({ success: true, message: "Login successful!" }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    const token = jwt.sign({ rollNo: body.rollNo }, JWT_SECRET, { expiresIn: "1h" });
+
+    const response = NextResponse.json({ success: true, message: 'Login successful' });
+    response.cookies.set("token", token, {
+        name: "token",
+        value: token,
+        httpOnly: true,
+        maxAge: 3600,
+        path: "/"
     });
 
-  } catch (error) {
-    console.error("Login error:", error.message);
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+    return response;
 }
+
+
+
