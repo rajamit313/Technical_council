@@ -9,7 +9,7 @@ const Navbar = () => {
         
         {/* Logo/Title */}
         <Link href="/" className="text-xl font-bold text-blue-700 dark:text-white">
-          CoNectivITTy
+          CommuNITTy
         </Link>
 
         {/* Navigation Links */}
